@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monte Carlo Race</title>
+    <style>
+      body {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      canvas {
+        background: #fff;
+        display: block;
+        margin: auto;
+      }
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+      .winner-alert {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 2px solid black;
+        text-align: center;
+      }
+      .winner-alert img {
+        width: 300px;
+        height: 300px;
+        display: block;
+        margin: auto;
+      }
+      .winner-alert p {
+        margin-top: 10px;
+        font-size: 18px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="raceCanvas" width="800" height="600"></canvas>
+    <br />
+    <button onclick="startRace()">START</button>
+
+    <script>
+      const canvas = document.getElementById("raceCanvas");
+      const ctx = canvas.getContext("2d");
+      const cars = [
+        { color: "pink", y: 100, x: 50, speed: Math.random() * 3 + 2 },
+        { color: "orange", y: 200, x: 50, speed: Math.random() * 3 + 2 },
+        { color: "green", y: 300, x: 50, speed: Math.random() * 3 + 2 },
+        { color: "black", y: 400, x: 50, speed: Math.random() * 3 + 2 },
+        { color: "blue", y: 500, x: 50, speed: Math.random() * 3 + 2 },
+      ];
+      const FINISH_LINE = canvas.width - 100;
+      let winner = null;
+      let running = false;
+
+      function drawRaceTrack() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "black";
+        ctx.fillRect(FINISH_LINE, 50, 5, canvas.height - 100);
+      }
+
+      function drawCars() {
+        cars.forEach((car) => {
+          ctx.fillStyle = car.color;
+          ctx.fillRect(car.x, car.y, 50, 30);
+        });
+      }
+
+      function updateRace() {
+        if (!running) return;
+        drawRaceTrack();
+        cars.forEach((car) => {
+          if (!winner) {
+            car.x += Math.random() * 3 + 2;
+          }
+          if (car.x >= FINISH_LINE && !winner) {
+            winner = car.color;
+            showWinnerAlert(winner);
+            running = false;
+          }
+        });
+        drawCars();
+        requestAnimationFrame(updateRace);
+      }
+
+      function startRace() {
+        running = true;
+        winner = null;
+        cars.forEach((car) => (car.x = 50));
+        updateRace();
+      }
+
+      function showWinnerAlert(color) {
+        let message = "";
+        let imageUrl = "";
+        if (color === "pink") {
+          message = "Pemenang: Wadea";
+          imageUrl = "img/dea.jpg";
+        } else if (color === "blue") {
+          message = "Pemenang: Ridho";
+          imageUrl = "img/ridho.jpg";
+        } else if (color === "green") {
+          message = "Pemenang: Alif";
+          imageUrl = "img/alif.jpg";
+        } else if (color === "black") {
+          message = "Pemenang: Dimas";
+          imageUrl = "img/dimas.jpg";
+        } else if (color === "orange") {
+          message = "Pemenang: Ramzi";
+          imageUrl = "img/ramzi.jpg";
+        }
+
+        let alertBox = `<div class='winner-alert'>
+                          <img src='${imageUrl}' alt='Winner'>
+                          <p>${message}</p>
+                          <button onclick='this.parentNode.remove()'>OK</button>
+                        </div>`;
+        document.body.insertAdjacentHTML("beforeend", alertBox);
+      }
+    </script>
+  </body>
+</html>
